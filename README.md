@@ -58,15 +58,40 @@ it depends on none of the others; they build on it.
 
 ## Install
 
-Packages are not yet published. The intended distribution is per-library, on both
-crates.io (Rust) and PyPI (Python):
+Every library is **directly installable** from both crates.io (Rust) and PyPI
+(Python). The four packages are **publishing shortly** — the versions below are
+the initial public releases:
 
-| Library      | cargo                    | pip                       | Status |
-|--------------|--------------------------|---------------------------|--------|
-| petekTools   | `cargo add petektools`   | `pip install petektools`  | coming |
-| petekIO      | `cargo add petekio`      | `pip install petekio`     | coming |
-| petekStatic  | `cargo add petekstatic`  | `pip install petekstatic` | coming |
-| petekSim     | `cargo add peteksim`     | `pip install peteksim`    | coming |
+| Library      | version | pip                        | Status              |
+|--------------|---------|----------------------------|---------------------|
+| petekTools   | 0.2.0   | `pip install petektools`   | publishing shortly  |
+| petekIO      | 0.3.0   | `pip install petekio`      | publishing shortly  |
+| petekStatic  | 0.1.0   | `pip install petekstatic`  | publishing shortly  |
+| petekSim     | 0.1.0   | `pip install peteksim`     | publishing shortly  |
+
+### Rust (crates.io)
+
+petekTools and petekIO are single crates; petekStatic and petekSim publish a set
+of small `srs-*` crates (aggregate entry crates `srs-model` and `srs-core`):
+
+```sh
+cargo add petektools@0.2.0     # TOOLKIT — numeric kernels, units, container
+cargo add petekio@0.3.0        # DATA    — ingest + model-ready inputs
+cargo add srs-model@0.1.0      # GEOMODEL — StaticModel aggregate (petekStatic)
+cargo add srs-core@0.1.0       # SIMULATION — appraisal orchestration (petekSim)
+```
+
+### Python (PyPI)
+
+```sh
+pip install petektools==0.2.0
+pip install petekio==0.3.0
+pip install petekstatic==0.1.0   # minimal wheel: build a StaticModel, read volumes + bundles
+pip install peteksim==0.1.0      # the full appraisal facade over the whole stack
+```
+
+Dependencies resolve automatically in DAG order (peteksim pulls the stack;
+petekstatic pulls petekio + petektools).
 
 ## License
 
