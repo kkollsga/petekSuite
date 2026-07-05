@@ -70,16 +70,7 @@ jobs:
           true
 
       - name: Guard reference autodoc (strip blocks for absent wheels)
-        run: |
-          for slug in petektools petekio peteksim; do
-            if ! python -c "import ${slug}" 2>/dev/null; then
-              echo "::notice::${slug} not importable — rendering curated reference only"
-              # drop the trailing ':::' autodoc block; keep the curated tables
-              awk 'BEGIN{skip=0} /^::: /{skip=1} skip==0{print}' \
-                "docs/reference/${slug}.md" > "docs/reference/${slug}.md.tmp" \
-                && mv "docs/reference/${slug}.md.tmp" "docs/reference/${slug}.md"
-            fi
-          done
+        run: bash scripts/strip_unimportable_refs.sh
 
       - name: Sync per-library docs + notebooks
         run: bash scripts/sync_library_docs.sh

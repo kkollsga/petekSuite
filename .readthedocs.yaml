@@ -27,9 +27,8 @@ build:
       - '[ -d _libs/petekSim/crates/srs-py ] && pip install ./_libs/petekSim/crates/srs-py || true'
       # 3. Degrade gracefully: for any library whose wheel is not importable,
       #    strip the trailing ':::' autodoc block from its reference page so the
-      #    curated tables still render under --strict. (petekstatic's reference
-      #    is curated-only and has no autodoc block; the loop is a no-op for it.)
-      - for slug in petektools petekio petekstatic peteksim; do python -c "import $slug" 2>/dev/null || { awk 'BEGIN{skip=0} /^::: /{skip=1} skip==0{print}' "docs/reference/$slug.md" > "docs/reference/$slug.md.tmp" && mv "docs/reference/$slug.md.tmp" "docs/reference/$slug.md"; }; done
+      #    curated tables still render under --strict.
+      - bash scripts/strip_unimportable_refs.sh
       # 4. Confidentiality tripwire over docs content. The identifier patterns are
       #    injected via $SCRUB_PATTERNS in CI; absent on RTD, the benign default
       #    (machine-path leak guard) still runs.
