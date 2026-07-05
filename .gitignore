@@ -1,0 +1,33 @@
+# The coordinator's local working state — never committed (matches each library's convention).
+/dev-docs/
+/inbox/
+/.claude/
+/.mcp.json
+/CLAUDE.local.md
+/.venv/
+/.uv-cache/
+
+# The planning graph is local-only (CLAUDE.local.md policy) — never committed.
+/research/
+__pycache__/
+*.pyc
+
+# The managed libraries are their own repos — not tracked by the suite root.
+/petekIO/
+/petekStatic/
+/petekSim/
+/petekTools/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# The confidentiality tripwire contains the identifier patterns it hunts — never committed.
+/scrub-check.sh
+
+# Local agent/tooling config + helper scripts + study Makefile — never committed.
+/.agents/
+/.codex/
+/gq
+/kg
+/Makefile.local
