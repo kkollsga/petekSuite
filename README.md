@@ -66,7 +66,7 @@ Every library is **directly installable** from both crates.io (Rust) and PyPI
 | petekTools   | 0.2.0   | `pip install petektools`   | live                |
 | petekIO      | 0.3.0   | `pip install petekio`      | live                |
 | petekStatic  | 0.1.0   | `pip install petekstatic`  | live                |
-| petekSim     | 0.1.0   | `pip install peteksim`     | publishing shortly  |
+| petekSim     | 0.1.0   | `pip install peteksim`     | live                |
 
 ### Rust (crates.io)
 

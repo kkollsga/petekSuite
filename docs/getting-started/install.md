@@ -4,11 +4,7 @@ The suite is distributed **per library**, on both **crates.io** (Rust) and
 **PyPI** (Python). Each library is usable standalone; you only need the layers
 your work touches.
 
-!!! info "Rollout status"
-    All four crates and the `petektools` / `petekio` / `petekstatic` wheels are
-    **live**; the `peteksim` wheel is publishing shortly. Anything not yet on the
-    public indexes builds from the sibling source trees (see
-    [from source](#from-source)).
+All four libraries are **live** on both indexes.
 
 ## The install matrix
 
