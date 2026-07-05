@@ -12,6 +12,13 @@
 # in CI). Sources that are missing are skipped with a warning, so the umbrella
 # still builds from its committed copies when a sibling isn't present.
 #
+# Clone mode (for hosts with no local siblings — e.g. Read the Docs):
+#   PETEK_DOCS_CLONE=1 scripts/sync_library_docs.sh
+# clones each library fresh from GitHub into _libs/<repo> (a build-local dir,
+# gitignored) before syncing. Override the source owner/host or the clone dir:
+#   PETEK_DOCS_GIT_BASE=https://github.com/kkollsga   (default)
+#   PETEK_DOCS_LIBS_DIR=_libs                          (default, relative to ROOT)
+#
 # Usage:  scripts/sync_library_docs.sh
 set -euo pipefail
 
@@ -26,11 +33,35 @@ LIBS=(
   "petekSim:peteksim"
 )
 
+CLONE="${PETEK_DOCS_CLONE:-0}"
+GIT_BASE="${PETEK_DOCS_GIT_BASE:-https://github.com/kkollsga}"
+LIBS_DIR="${PETEK_DOCS_LIBS_DIR:-_libs}"
+
+# Clone-mode: fetch each library fresh (shallow) into $LIBS_DIR/<repo> unless a
+# local sibling or a prior clone is already present. Best-effort — a repo that
+# fails to clone is skipped, and sync_one falls back to the committed copy.
+clone_one() {
+  local repo="$1"
+  local dest="$ROOT/$LIBS_DIR/$repo"
+  if [ -d "$ROOT/$repo" ]; then
+    echo "  = $repo local sibling present (no clone)"; return 0
+  fi
+  if [ -d "$dest/.git" ] || [ -d "$dest" ]; then
+    echo "  = $repo already at $LIBS_DIR/$repo (no clone)"; return 0
+  fi
+  mkdir -p "$ROOT/$LIBS_DIR"
+  if git clone --depth 1 "$GIT_BASE/$repo.git" "$dest" 2>/dev/null; then
+    echo "  + cloned $repo -> $LIBS_DIR/$repo"
+  else
+    echo "  ! clone of $GIT_BASE/$repo.git failed (keeping committed copy)"
+  fi
+}
+
 sync_one() {
   local repo="$1" slug="$2" src
-  # A sibling repo may sit beside the umbrella, or (in CI) be checked out into
-  # _libs/<repo>. Try both.
-  for base in "$ROOT/$repo" "$ROOT/_libs/$repo"; do
+  # A sibling repo may sit beside the umbrella, or (in CI / clone mode) be
+  # checked out into $LIBS_DIR/<repo>. Try both.
+  for base in "$ROOT/$repo" "$ROOT/$LIBS_DIR/$repo"; do
     if [ -d "$base" ]; then src="$base"; fi
   done
   if [ -z "${src:-}" ]; then
@@ -68,6 +99,13 @@ sync_one() {
     echo "  ! $repo/examples/notebooks/*.ipynb missing (keeping committed copy)"
   fi
 }
+
+if [ "$CLONE" = "1" ]; then
+  echo "Clone mode: fetching libraries from $GIT_BASE into $LIBS_DIR/"
+  for entry in "${LIBS[@]}"; do
+    clone_one "${entry%%:*}"
+  done
+fi
 
 echo "Syncing library docs into the umbrella site:"
 for entry in "${LIBS[@]}"; do

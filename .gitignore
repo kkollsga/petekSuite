@@ -39,3 +39,6 @@ __pycache__/
 
 # mkdocs / mkdocs-jupyter build cache — never committed.
 /.cache/
+
+# Libraries cloned fresh by the docs build (clone mode / RTD pre_build) — never committed.
+/_libs/

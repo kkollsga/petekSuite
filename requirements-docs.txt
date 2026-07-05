@@ -3,9 +3,15 @@
 #     python -m pip install -r requirements-docs.txt
 #
 # NOTE: the Python API Reference (mkdocstrings) additionally imports the built
-# wheels (petektools / petekio / peteksim). CI installs those from the sibling
-# source trees before building; locally, `pip install ./petekTools ./petekIO
-# ./petekSim/crates/srs-py` into the docs venv.
+# wheels (petektools / petekio / petekstatic / peteksim). These are NOT listed as
+# hard requirements below — none are on PyPI yet, so a `pip install -r` would fail
+# on a 404. They are installed best-effort in the docs build (GitHub Actions
+# `docs` job and .readthedocs.yaml pre_build): PyPI first, then a source build
+# from the sibling/cloned trees; a reference page whose wheel is not importable
+# degrades to its curated tables (autodoc block stripped). Once published, pin:
+#     petektools>=0.2.0  petekio>=0.3.0  petekstatic>=0.1.0  peteksim>=0.1.0
+# Locally: `pip install ./petekTools ./petekIO ./petekStatic ./petekSim/crates/srs-py`
+# into the docs venv.
 mkdocs==1.6.1
 mkdocs-material==9.5.44
 mkdocstrings[python]==0.27.0

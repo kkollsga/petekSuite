@@ -1,0 +1,48 @@
+# Read the Docs build for the petekSuite unified documentation site.
+# Reproduces the GitHub Actions `docs` workflow (.github/workflows/docs.yml):
+# ubuntu-24.04 · Python 3.12 · mkdocs-material built from mkdocs.yml, strict.
+#
+# Unlike CI, Read the Docs checks out ONLY this umbrella repo, so the four
+# library repos are cloned fresh over public HTTPS in the pre_build phase
+# (PETEK_DOCS_CLONE=1) to refresh the per-library guides + executed notebooks.
+# The umbrella carries committed copies, so a clone that fails still builds.
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"
+  jobs:
+    # RTD order: checkout -> create env -> python.install -> pre_build -> mkdocs build.
+    pre_build:
+      # 1. Clone the four sibling libraries from GitHub + sync their guides and
+      #    executed notebooks into docs/ (see scripts/sync_library_docs.sh).
+      - PETEK_DOCS_CLONE=1 bash scripts/sync_library_docs.sh
+      # 2. The Python API Reference (mkdocstrings) imports the built wheels.
+      #    Best-effort, mirroring CI: try PyPI first (once published), then build
+      #    from the freshly cloned source trees. Rust may be absent on RTD, so a
+      #    source build can fail — the guard step below keeps the build green.
+      - pip install petektools petekio petekstatic peteksim || true
+      - for p in _libs/petekTools _libs/petekIO _libs/petekStatic; do [ -d "$p" ] && pip install "$p" || true; done
+      - '[ -d _libs/petekSim/crates/srs-py ] && pip install ./_libs/petekSim/crates/srs-py || true'
+      # 3. Degrade gracefully: for any library whose wheel is not importable,
+      #    strip the trailing ':::' autodoc block from its reference page so the
+      #    curated tables still render under --strict. (petekstatic's reference
+      #    is curated-only and has no autodoc block; the loop is a no-op for it.)
+      - for slug in petektools petekio petekstatic peteksim; do python -c "import $slug" 2>/dev/null || { awk 'BEGIN{skip=0} /^::: /{skip=1} skip==0{print}' "docs/reference/$slug.md" > "docs/reference/$slug.md.tmp" && mv "docs/reference/$slug.md.tmp" "docs/reference/$slug.md"; }; done
+      # 4. Confidentiality tripwire over docs content. The identifier patterns are
+      #    injected via $SCRUB_PATTERNS in CI; absent on RTD, the benign default
+      #    (machine-path leak guard) still runs.
+      - bash scripts/scrub_docs.sh
+
+# The mkdocs toolchain (mkdocs, material, mkdocstrings, jupyter, black). The four
+# library wheels are NOT hard requirements here — none are on PyPI yet, so they
+# are installed best-effort in pre_build (step 2). Once published, their floors
+# are: petektools>=0.2.0, petekio>=0.3.0, petekstatic>=0.1.0, peteksim>=0.1.0.
+python:
+  install:
+    - requirements: requirements-docs.txt
+
+mkdocs:
+  configuration: mkdocs.yml
+  fail_on_warning: true   # == `mkdocs build --strict`
