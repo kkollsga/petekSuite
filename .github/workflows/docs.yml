@@ -1,12 +1,9 @@
 name: docs
 
 # Build the unified documentation site (mkdocs-material), enforce a strict build,
-# check links, run the confidentiality scrub over docs content, and deploy to
-# GitHub Pages.
-#
-# NOTE: Pages only serves once the repo is public. The build + scrub + link check
-# run on every push (the quality gate); the deploy job activates when Pages is
-# enabled on a public repo.
+# check links, and run the confidentiality scrub over docs content. This is the
+# QUALITY GATE only — the site is hosted on Read the Docs (peteksuite.readthedocs.io),
+# which builds from .readthedocs.yaml on its own webhook.
 
 on:
   push:
@@ -17,8 +14,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: docs-${{ github.ref }}
@@ -92,21 +87,8 @@ jobs:
           pip install linkchecker || true
           linkchecker --check-extern --ignore-url='^https?://' site/index.html || true
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload built site (inspection artifact)
+        uses: actions/upload-artifact@v4
         with:
+          name: site
           path: site
-
-  deploy:
-    # Activates once Pages is enabled (public repo). Safe to keep — it no-ops
-    # until Pages is configured.
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
