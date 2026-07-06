@@ -21,7 +21,14 @@ cd "$ROOT"
 # set is injected via $SCRUB_PATTERNS and never tracked.
 PATTERN="${SCRUB_PATTERNS:-/Volumes/|/Users/}"
 
-hits="$(grep -rniE "$PATTERN" docs mkdocs.yml requirements-docs.txt 2>/dev/null || true)"
+# Verified false-positive line classes (executed-notebook artifacts, not text):
+#   "image/png"                    — base64 PNG payloads (random digit runs)
+#   iopub. / shell.execute_reply   — execution-metadata ISO timestamps
+# The PATTERN itself is untouched; notebook code + markdown cells and every
+# text output are still fully scanned.
+EXCLUDE='"image/png"|iopub\.|shell\.execute_reply'
+
+hits="$(grep -rniE "$PATTERN" docs mkdocs.yml requirements-docs.txt 2>/dev/null | grep -viE "$EXCLUDE" || true)"
 
 if [ -n "$hits" ]; then
   echo "scrub-check: FAIL — confidential-pattern hits in docs content:"
