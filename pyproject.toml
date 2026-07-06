@@ -25,7 +25,7 @@ dependencies = [
 
 [project.urls]
 Documentation = "https://peteksuite.readthedocs.io/"
-Repository = "https://github.com/kkollsga/petekSuite"
+Repository = "https://github.com/kkollsga/peteksuite"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/peteksuite"]
