@@ -17,3 +17,12 @@ def test_layer_shorthand_aliases_are_advertised():
 
     assert {"pio", "pto", "pst", "ps"}.issubset(set(peteksuite.__all__))
     assert {"pio", "pto", "pst", "ps"}.issubset(set(dir(peteksuite)))
+
+
+def test_versions_reports_installed_metadata_version():
+    from importlib.metadata import version
+
+    import peteksuite
+
+    assert peteksuite.__version__ == version("peteksuite")
+    assert peteksuite.versions()["peteksuite"] == version("peteksuite")

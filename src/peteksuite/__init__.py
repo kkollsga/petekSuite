@@ -21,7 +21,10 @@ https://peteksuite.readthedocs.io/ for the tutorials and the full reference.
 from importlib import import_module
 from importlib.metadata import PackageNotFoundError, version as _version
 
-__version__ = "0.1.7"
+try:
+    __version__ = _version("peteksuite")
+except PackageNotFoundError:  # pragma: no cover - editable source before install
+    __version__ = "0+unknown"
 __all__ = ["__version__", "versions", "pio", "pto", "pst", "ps"]
 
 _FAMILY = ("petektools", "petekio", "petekstatic", "peteksim")

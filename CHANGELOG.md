@@ -5,6 +5,13 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-07-08
+
+### Fixed
+- Fixed `peteksuite.__version__` and `peteksuite.versions()["peteksuite"]` so
+  they report the installed package metadata version instead of a stale
+  hardcoded value.
+
 ## [0.1.8] - 2026-07-08
 
 ### Changed
