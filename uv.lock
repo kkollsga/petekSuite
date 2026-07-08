@@ -1157,7 +1157,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "pandas", marker = "extra == 'pandas'" },
-    { name = "petektools", specifier = ">=0.2.6,<0.3" },
+    { name = "petektools", specifier = ">=0.2.7,<0.3" },
 ]
 provides-extras = ["pandas"]
 
@@ -1172,9 +1172,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "petekio", specifier = ">=0.3.7" },
-    { name = "petekstatic", specifier = ">=0.1.10" },
-    { name = "petektools", specifier = ">=0.2.6" },
+    { name = "petekio", specifier = ">=0.3.8" },
+    { name = "petekstatic", specifier = ">=0.1.11" },
+    { name = "petektools", specifier = ">=0.2.7" },
 ]
 
 [[package]]
@@ -1187,13 +1187,13 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "petekio", specifier = ">=0.3.7,<0.4" },
-    { name = "petektools", specifier = ">=0.2.6,<0.3" },
+    { name = "petekio", specifier = ">=0.3.8,<0.4" },
+    { name = "petektools", specifier = ">=0.2.7,<0.3" },
 ]
 
 [[package]]
 name = "peteksuite"
-version = "0.1.7"
+version = "0.1.8"
 source = { editable = "." }
 dependencies = [
     { name = "petekio" },

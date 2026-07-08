@@ -36,8 +36,8 @@ build:
 
 # The mkdocs toolchain (mkdocs, material, mkdocstrings, jupyter, black). The four
 # library wheels are installed best-effort in pre_build (step 2). Current release
-# floors: petektools>=0.2.3, petekio>=0.3.2, petekstatic>=0.1.5,
-# peteksim>=0.1.3.
+# floors: petektools>=0.2.7, petekio>=0.3.8, petekstatic>=0.1.11,
+# peteksim>=0.1.9.
 python:
   install:
     - requirements: requirements-docs.txt

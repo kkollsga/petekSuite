@@ -91,6 +91,29 @@ node counts, CCW rotation, and an optional y-flip. It carries the forward map
 kernel needs to place a sample on the grid. Kernels never take a caller's grid
 type; they take a `Lattice`, so any regular areal grid maps on field-for-field.
 
+## 1-D interpolation
+
+`interp1d` is the shared resampling kernel for curve-like data such as well
+logs. The Rust surface accepts finite, strictly increasing `x` knots, matching
+`y` values, query positions, an `Interp1dMethod`, and an `extrapolate` flag. The
+Python wheel exposes the same kernel as:
+
+```python
+import petektools as pt
+
+values = pt.interp1d(
+    [1000.0, 1001.0, 1003.0],
+    [0.22, 0.25, 0.21],
+    [1000.5, 1002.0],
+    method="cubic",
+)
+```
+
+Methods are `nearest`/`closest`, `previous`/`ffill`, `next`/`bfill`, `linear`,
+and `cubic`/`spline`. The cubic method is a natural cubic spline (`S'' = 0` at
+both endpoints), implemented in Rust as a clean-room numeric kernel. It is not
+SciPy's default not-a-knot spline.
+
 ## Geostatistics
 
 Beyond deterministic gridding, petekTools ships a geostatistics front-door: an
@@ -159,6 +182,12 @@ declares and computes nothing itself; new cross-sections come from a consumer's
 `section_provider` callback (live) or are pre-computed into the payload (file).
 The viewer is horizontal capability: it serves every layer of the ecosystem, so
 it lives here. The full guide is in `VIEWER.md`.
+
+For lightweight map QC, `petektools.view2d([...])` accepts point-like objects
+and geometry-like objects. Point sets render as points only. Geometry-like
+objects render grid lines, and when they expose an `edge` polygon the grid-line
+overlay is clipped to that edge so inferred grids, structured surfaces, and
+point clouds line up in the same view.
 
 ## Where to go next
 
