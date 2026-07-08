@@ -57,7 +57,12 @@ jobs:
       - name: Install library wheels (best-effort)
         continue-on-error: true
         run: |
-          pip install petektools petekio petekstatic peteksim || true
+          timeout 180s pip install \
+            --no-cache-dir \
+            --only-binary=:all: \
+            --retries 2 \
+            --timeout 20 \
+            petektools petekio petekstatic peteksim || true
           for p in _libs/petekTools _libs/petekIO _libs/petekStatic; do
             [ -d "$p" ] && pip install "$p" || true
           done

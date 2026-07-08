@@ -5,6 +5,16 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-07-08
+
+### Changed
+- Updated the suite meta-package dependency floors for the current release train:
+  petekTools 0.2.6, petekIO 0.3.7, petekStatic 0.1.10, and petekSim 0.1.8.
+- Refreshed install/reference docs so the suite points at the new point-edge,
+  structured surface, and viewer topology-grid QA releases.
+- Hardened release/docs workflows with binary-only retrying installs and a PyPI
+  visibility verification job before GitHub Release creation.
+
 ## [0.1.6] - 2026-07-08
 
 ### Changed

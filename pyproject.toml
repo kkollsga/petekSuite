@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "peteksuite"
-version = "0.1.6"
+version = "0.1.7"
 description = "The petek subsurface-modelling suite — installs the whole family (petektools, petekio, petekstatic, peteksim)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,15 +17,35 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "petektools>=0.2.5",
-    "petekio>=0.3.6",
-    "petekstatic>=0.1.9",
-    "peteksim>=0.1.7",
+    "petektools>=0.2.6",
+    "petekio>=0.3.7",
+    "petekstatic>=0.1.10",
+    "peteksim>=0.1.8",
+]
+
+[dependency-groups]
+dev = [
+    "jupyterlab>=4.6.1",
+    "kglite-cli>=0.12.10",
+    "maturin>=1.14.1",
+    "pytest>=9.1.1",
 ]
 
 [project.urls]
 Documentation = "https://peteksuite.readthedocs.io/"
 Repository = "https://github.com/kkollsga/peteksuite"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.sources]
+petektools = { path = "petekTools", editable = true }
+petekio = { path = "petekIO", editable = true }
+petekstatic = { path = "petekStatic", editable = true }
+peteksim = { path = "petekSim/crates/srs-py", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/peteksuite"]
