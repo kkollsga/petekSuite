@@ -5,6 +5,14 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-07-08
+
+### Changed
+- Updated the suite meta-package dependency floors for the current release train:
+  petekTools 0.2.4, petekIO 0.3.5, petekStatic 0.1.8, and petekSim 0.1.6.
+- Refreshed install and reference docs so the suite points at the newly
+  published family versions and petekIO's current `Project.import_data` API.
+
 ## [0.1.4] - 2026-07-07
 
 ### Changed

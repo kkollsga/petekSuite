@@ -11,9 +11,9 @@ the static workflow in `petekstatic`:
 import petekio as pio
 import petekstatic as pst
 
-project = pio.Project.load(
+project = pio.Project.import_data(
     "Data",
-    settings=pio.LoadSettings(
+    settings=pio.ImportSettings(
         crs="EPSG:32631",
         aliases={"PHIE": ["PHI", "PHIE"], "NetSand": ["NTG", "NETSAND"]},
     ),
@@ -68,7 +68,7 @@ the crate root:
 | Volumetrics + static uncertainty | `petekstatic::{volumetrics, uncertainty}` |
 | Model-ready input access | `petekstatic::data` |
 
-Full Rust reference: [docs.rs/petekstatic/0.1.7](https://docs.rs/petekstatic/0.1.7)
+Full Rust reference: [docs.rs/petekstatic/0.1.8](https://docs.rs/petekstatic/0.1.8)
 (see the [Rust API page](rust.md)). Design constitution and the locked contract
 live in the repo's `SPEC.md` / `API.md`.
 

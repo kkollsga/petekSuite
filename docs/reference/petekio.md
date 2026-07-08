@@ -29,3 +29,4 @@ See the [petekIO guide](../libraries/petekio.md), the
       show_root_toc_entry: false
       heading_level: 3
       members_order: alphabetical
+      show_docstring_description: false

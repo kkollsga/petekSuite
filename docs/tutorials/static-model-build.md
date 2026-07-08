@@ -44,15 +44,15 @@ contacts, aliases, CRS) you build the specs against.
 
 ## 1 · Ingest
 
-Project loading is owned by `petekio`; `LoadSettings` carries the CRS and the
+Project loading is owned by `petekio`; `ImportSettings` carries the CRS and the
 mnemonic aliases there.
 
 ```python
 import petekio as pio
 
-proj = pio.Project.load(
+proj = pio.Project.import_data(
     man["root"],
-    settings=pio.LoadSettings(crs=man["crs"], aliases=man["aliases"]),
+    settings=pio.ImportSettings(crs=man["crs"], aliases=man["aliases"]),
 )
 proj.inventory()          # what loaded, and what was skipped-with-reason
 ```
