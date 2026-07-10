@@ -111,7 +111,7 @@ values = pt.interp1d(
 
 Methods are `nearest`/`closest`, `previous`/`ffill`, `next`/`bfill`, `linear`,
 and `cubic`/`spline`. The cubic method is a natural cubic spline (`S'' = 0` at
-both endpoints), implemented in Rust as a clean-room numeric kernel. It is not
+both endpoints), implemented in Rust from the standard derivation. It is not
 SciPy's default not-a-knot spline.
 
 ## Geostatistics
