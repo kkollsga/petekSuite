@@ -5,6 +5,18 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.12] - 2026-07-10
+
+### Changed
+- Dependency floors raised to the coherent viewer↔data seam pair:
+  `petektools>=0.2.10` (view2d value-coloured fills, contour lines with bold
+  index levels, depth-coded points, trimesh wireframe rendering) and
+  `petekio>=0.3.11` (three-level geometry-shell system, `max_bridge` open-seam
+  closing, `iso_lines`/`value_layer` producers, shell-once `.pproj` lanes).
+- Central skills are now shared between Codex and Claude through a tracked
+  `.claude/skills → .agents/skills` symlink; managed sublibraries carry no
+  skill trees.
+
 ## [0.1.11] - 2026-07-10
 
 ### Changed
