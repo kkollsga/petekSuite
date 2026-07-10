@@ -84,10 +84,11 @@ Use the skills — don't hand-roll their jobs:
 - **`suite-status`** — roll up ecosystem readiness (each library's state + the
   graph's lifecycle dashboard + dependency-version coherence). The coordinator's
   "are we coherent to ship?" view.
-- **`release`** — run the suite release train from here: check each subrepo one
-  by one, sweep docs/changelog against the release diff, bump patch by default
-  unless the user specifies otherwise, run gates, commit/tag, push with explicit
-  approval, then monitor CI/release/RTD before moving to the next repo.
+- **`release`** — run the suite release train from here: prepare each subrepo
+  independently, then publish in dependency waves (Tools → IO+Static → Sim →
+  Suite). Raise downstream dependency floors only when code requires the new
+  upstream API/fix, and advance on registry availability rather than waiting for
+  unrelated GitHub Release/RTD jobs.
 
 ## Working style
 
@@ -98,12 +99,11 @@ Use the skills — don't hand-roll their jobs:
 - **Route, don't hoard.** Keep only genuinely cross-library work here; push the
   rest down to the owning library.
 
-## Pre-git mode
+## Git mode
 
-petekSuite is **not yet a git repo** (the graph HAS moved here — it lives at
-`petekSuite/research/graph`). Until `git init` happens, `coordinate`'s branch/PR
-steps and `suite-status`'s push/publish coherence checks run in a local, pre-git
-mode. Activate the full flow once git lands.
+petekSuite is a git repo. Cross-library initiatives use coordinator branches and
+the full branch/PR checks; the planning graph remains gitignored working state at
+`petekSuite/research/graph` and must still be saved through the `contract` MCP.
 
 ## Commits & releases
 
