@@ -21,6 +21,24 @@ model.view(block=True)          # blocking: serve until Ctrl-C
 model.save_view("model.html")   # ONE self-contained HTML file (opens off file://)
 ```
 
+For imported data projects, open the multi-view application directly. It
+catalogues first and materializes Map, 3-D and Wells resources only when they
+are selected:
+
+```python
+workspace = project.view()
+# Equivalent generic provider entry point:
+workspace = petektools.view(project)
+```
+
+The application has a searchable typed project tree, independent visibility
+per view, a contextual Inspector, stable camera ownership, progressive compact
+surface detail, and a correlation panel when well logs exist. Surface selection
+uses producer-computed well intersections so trajectories stop at their exact
+first MD/XYZ crossing without synthetic bounding boxes. Filled surface grids
+default off; every application control exposes hover/focus help, while data
+inspection remains click-to-toggle.
+
 | | `view()` (live server) | `save_view()` (single file) |
 |---|---|---|
 | Map / Intersection / Volume / Wells / Charts | ✅ | ✅ |

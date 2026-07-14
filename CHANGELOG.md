@@ -5,6 +5,44 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-07-14
+
+### Changed
+- Advanced the coherent suite floors to `petektools>=0.2.15`,
+  `petekio>=0.3.15`, `petekstatic>=0.1.13`, and `peteksim>=0.1.13`.
+- Released the updated viewer design schema end to end: workspace-v2 shared
+  Map/3-D resources and truthful runtime state, durable project/attribute
+  metadata, oriented geomodel frames and schema-v6 sections, plus executable
+  full-stack acceptance across map, section, volume, well-tie, contact,
+  pinch-out, realization, save, and serve paths.
+- Pinned unified-docs library clones to these release tags and preserved the
+  reviewed committed guides/notebooks during CI and Read the Docs builds.
+
+## [0.1.14] - 2026-07-14
+
+### Changed
+- Advanced the umbrella floors to `petektools>=0.2.14` and
+  `petekio>=0.3.14`. This release adds a stable lazy multi-view project app,
+  compact progressive Map/3-D surface transport, exact surface-clipped wells,
+  practical correlation layouts, persistent project templates/horizons, and
+  canonical EarthVision surface routing.
+- Refreshed the unified visualization and library guides with the new
+  `project.view()` / `petektools.view(...)` workflow, well/surface intersection
+  persistence, correlation templates, geometry-only inference shells, and
+  compact affine surface behavior.
+
+## [0.1.13] - 2026-07-13
+
+### Changed
+- Advanced the umbrella floors to `petektools>=0.2.13` and
+  `petekio>=0.3.13`. The pair adds click-to-inspect Map/3D interaction,
+  per-object viewer styling, automatic primary/Surface-attribute fill
+  selection, 3.4-cell geometry fallback bridging, typed Surface attributes,
+  instance `top.thickness(base)`, and smooth/dip/extrapolation operations.
+- Refreshed the unified petekTools and petekIO guides from their owning
+  repositories, including the exact viewer and Surface workflows released in
+  this train. Corrected the remaining documentation provenance wording.
+
 ## [0.1.12] - 2026-07-10
 
 ### Changed

@@ -51,6 +51,11 @@ auto-routing sidetracks; a vertical trajectory spanning the logged MD is built w
 no survey is supplied. Named access (`geo.well(id)`, `geo.surface(name)`) and a
 broadcastable `geo.wells` view come for free.
 
+Surface picks remain explicit: `bore.intersection(surface)` computes without
+mutation, `bore.add_top(name, hit)` persists one selected crossing, and
+`project.well_tops[name] = project.wells.intersection(surface)` validates then
+atomically replaces a complete project horizon.
+
 ## Surfaces
 
 A `Surface` is a regular gridded layer (e.g. a depth horizon) on a `GridGeometry`.
@@ -65,8 +70,30 @@ top.stats().mean                # count / mean / min / max / std / p10 / p50 / p
 top.area_below(1990.0)          # Σ cell-area where value ≤ depth — the GRV-style query
 top.resample(target_geometry)   # bilinear onto another lattice
 base = geo.surface("base_res")
-thick = petekio.Surface.thickness(top, base, clamp_zero=True)  # base − top, ≥ 0
+thick = top.thickness(base, clamp_zero=True)  # base − top, ≥ 0
+# Equivalent unbound form: petekio.Surface.thickness(top, base, clamp_zero=True)
+top.thickness = thick              # add/replace a COW attribute lane
+top.attr["thickness"]              # read the promoted lane as a Surface
+smoothed = top.smooth(radius=1)    # moving average; holes remain holes
+dip = top.dip_angle()              # degrees from horizontal
+azimuth = top.dip_azimuth()        # down-dip, clockwise from North
+filled = top.extrapolate("nearest")  # fill holes; also "idw" / "min_curvature"
 ```
+
+Surface assignment accepts only another `Surface` with exactly the same grid
+geometry (including origin, increments, node counts, rotation, and y-flip).
+`set_attr("thickness", thick)` is the explicit equivalent. Attribute lanes are
+read through `surface.attr[...]`, leaving `Surface.thickness(...)` callable as
+the equivalent unbound thickness calculation; `surface.thickness(base)` remains
+the normal instance form.
+
+Dip uses central differences where both neighbours exist and one-sided
+differences at boundaries or beside holes. Derivatives are transformed through
+the grid spacing, rotation, and y-flip into world East/North. A flat node has
+zero dip angle and undefined (`NaN`) azimuth. Extrapolation uses only finite
+nodes as controls and changes only original `NaN` nodes; existing finite and
+infinite values remain bit-for-bit unchanged. All four methods above return a
+detached, same-geometry surface containing only its new primary lane.
 
 Scattered `(x, y, z)` data grids into a surface via `PointSet.to_surface(geom,
 method)` with `"nearest"`, `"idw"`, or `"minimum_curvature"` (Briggs biharmonic,
@@ -78,19 +105,30 @@ with `column` and `row` fields can instead become a `StructuredMeshSurface`,
 which keeps logical topology but stores explicit XY per node. Plain IRAP/XYZ
 point exports have to infer from XY alone unless `Project.import_data(...)` can
 enrich them from a same-stem EarthVision topology export in the raw project tree.
+EarthVision itself is canonically loaded as a null-preserving
+`StructuredMeshSurface` (`StructuredMeshSurface.load_earthvision_grid(...)`, or
+automatically under `Project.surfaces`); the IRAP finite-point export remains a
+separate `PointSet`.
 
 ```python
-geometry = pts.infer_geometry(tolerance=1e-3)  # GridGeometry or TriSurface
-if isinstance(geometry, petekio.GridGeometry):
-    surf = pts.to_surface(geometry, method="nearest")
-mesh = pts.to_structured_surface(edge="occupied")
+geom = pts.infer_geometry(tolerance=1e-3)  # GridGeometry | StructuredShell | MeshShell
+if isinstance(geom, petekio.GridGeometry):
+    surf = pts.to_surface(geom, method="nearest")
+elif isinstance(geom, petekio.StructuredShell):
+    surf = pts.to_structured_surface(edge="occupied")  # attach values explicitly
+else:
+    surf = pts.to_tri_surface(max_bridge=3.4)           # attach values explicitly
 ```
 
-Regular-grid inference remains strict: it only returns a `GridGeometry` when the
-points fit the detected lattice within tolerance. If they do not, the public
-`infer_geometry(...)` call falls back to an exact unstructured `TriSurface`
-instead of raising. Use `to_structured_surface(...)` when logical column/row
-topology matters; it stores explicit per-node XY for curvilinear meshes.
+Regular inference is deliberately strict and geometry-only. It returns a
+`StructuredShell` when explicit `column`/`row` topology validates a curvilinear
+mesh, otherwise a fault-aware `MeshShell`; it never returns values. Use
+`edge="occupied"` or `edge="convex_hull"` to select the regular or structured
+shell boundary. The `edge="full_rect"` default becomes occupied only for a
+curvilinear structured fallback because it has no nominal regular rectangle; a
+MeshShell boundary remains triangle-derived. Use
+`to_structured_surface(...)` or `to_tri_surface(...)` explicitly to attach the
+point values.
 
 When a surface export has lost its `column`/`row` fields, recover them rather than
 forcing the points onto a lattice:
@@ -110,10 +148,30 @@ the far side as its own **block** rather than silently welding them together.
 `report.blocks == 1` means an uninterrupted grid; more means the surface is fault-cut,
 and `verified` is `False`.
 
-`to_tri_surface(max_link=None)` is the fallback for that case: the points become the
-vertices of a triangulated surface, unmoved, and the fault is honoured rather than
-bridged — `TriSurface.components` reports how many blocks survived. `max_link` is the
-longest triangle edge to keep, in **cells**, and must lie in `(√2, 2)`.
+`to_tri_surface(max_link=None, max_bridge=None)` is the strict primitive for that case: the
+points become the vertices of a triangulated surface, unmoved, and the fault is
+honoured rather than bridged — `TriSurface.components` reports how many blocks
+survived. `max_link` is the longest triangle edge to keep, in **cells**, and must lie
+in `(√2, 2)`. `max_bridge` (also in cells, `>= max_link`) opt-in closes the mesh where
+the geometry does not close — the boundary fringe, fault seams, interior data gaps —
+admitting edges up to that length. The higher-level `infer_geometry(...)` MeshShell fallback
+defaults `max_bridge` to `3.4` cells to close ordinary export fringes and seams; pass
+`max_bridge=None` there for the strict lattice-closed result. `fallback="mesh"`
+is the default; legacy `fallback="tri"` is accepted with a deprecation warning
+and still returns geometry only. Calling
+`to_tri_surface()` directly remains strict by default.
+
+Geometry is a **flat empty shell** in three levels of complexity — the rigid
+`GridGeometry` (eight scalars, XY computed), the `StructuredShell` (`(i, j)` nodes
+with explicit XY), and the `MeshShell` (node ids + triangles + a quad-dominant
+wireframe) — and surfaces are a shell plus per-node property lanes (`values` = z
+first among equals, named attributes via `attr`/`set_attr`; shells are shared, so
+extra attributes never repeat geometry). Every surface level offers
+`iso_lines(interval=..., levels=..., attr=...)` contour polylines and
+`value_layer(attr=...)` for value-coloured viewing (the petektools 2-D viewer
+consumes both via `view2d(color=..., contours=...)`), and conversions run up the
+ladder losslessly (`to_structured_mesh()`, `to_tri_surface()`) or down by
+inference/resampling (`infer_grid(tolerance)`, `resample(geom, method)`).
 
 The default `edge="full_rect"` is the four-corner rectangle of the inferred
 lattice: cheap, but it claims the whole bounding lattice even where nodes carry no
@@ -212,6 +270,25 @@ w.view(spec=petekio.ViewSpec(curves=("PHIE", "SW"), tops=True),
        settings=petekio.ViewSettings(save="well.html", serve=False))  # declarative
 ```
 
+`LogSession.bundle()` returns the raw `WellLogBundle` producer value. At the
+render boundary, `.serve()` / `.save()` place that value in the documented
+generic viewer envelope as `wells_logs` with the map/volume/section tabs empty,
+so a logs-only page boots directly into the Wells tab.
+
+Named layouts can be snapshotted with the project. `template=` is presentation
+state, separate from `ViewSpec`; without it the historical bundle is unchanged.
+petekTools is imported only when a template is materialized or rendered.
+
+```python
+project.templates.add(template)                 # uses template.name; no upsert
+bound = project.templates.qc.reservoir          # immutable BoundTemplate
+project.wells.view(template=bound, serve=False)
+bound(wells=["A-1", "A-2"], save="correlation.html")
+project.templates.replace(revised_template)     # requires an existing name
+project.templates.rename("qc/reservoir", "production/reservoir")
+project.templates.delete("production/reservoir")
+```
+
 ## Projects & persistence
 
 A whole project serialises to a single structured `.pproj` file — atomic to write,
@@ -237,6 +314,10 @@ geo2 = petekio.GeoData.open("field.pproj")        # materialize
 petekio.GeoData.export("field.pproj", "share.pproj", ["field-a"])  # tagged subset
 ```
 
+Generic project assets are stored separately from model/data sections below the
+reserved physical namespace `@asset/`. Their typed/versioned envelope and bytes
+round-trip without provider imports; unknown asset types and fields are retained.
+
 ## Spec value-objects
 
 The declarative, frozen load- and view-time specs — each is JSON-durable
@@ -252,10 +333,10 @@ The declarative, frozen load- and view-time specs — each is JSON-durable
 
 | Domain | What you get |
 | --- | --- |
-| **Surfaces** | IRAP-classic / CPS-3 load, sample & resample (bilinear), edge polygons, arithmetic, stats, `area_below` volumetrics, gridding from scattered points (minimum-curvature) |
-| **Wells** | Positioned `.wellpath` trajectories (MD preserved; minimum-curvature), multi-bore sidetracks, imported logs stored as MD/value pairs with mnemonic aliasing, Petrel well-tops, per-zone stats, field-wide lithostratigraphic ordering, net cutoffs |
-| **Points / polygons** | IRAP / GeoJSON / CSV load, strict regular-grid geometry inference, clip, point-to-surface gridding |
-| **Project** | `GeoData` substrate — import raw data once, broadcast across the collection; read-only filtered views; compact `.pproj` load/save |
+| **Surfaces** | IRAP-classic / CPS-3 / EarthVision load, regular/structured/triangulated geometry, named attributes, smoothing, dip, null-hole extrapolation, contours, stats and volumetrics |
+| **Wells** | Positioned multi-bore trajectories and logs, exact MD/XYZ surface intersections, persistent computed horizons, correlation templates, zone statistics and net cutoffs |
+| **Points / polygons** | IRAP / GeoJSON / CSV load, geometry-only regular/structured/mesh inference, clipping and point-to-surface gridding |
+| **Project** | Import once; lazy Map/3-D/Wells workspace, persistent templates/assets/tops, read-only filtered views, and compact `.pproj` load/save |
 
 ## Where to go next
 
