@@ -20,8 +20,8 @@ from peteksuite import pio, pto, pst, ps
 
 | Library | Layer | `cargo` | `pip` | Version |
 |---|---|---|---|---|
-| **petekTools** | TOOLKIT | `cargo add petektools` | `pip install petektools` | `0.2.13` |
-| **petekIO** | DATA | `cargo add petekio` | `pip install petekio` | `0.3.13` |
+| **petekTools** | TOOLKIT | `cargo add petektools` | `pip install petektools` | `0.2.14` |
+| **petekIO** | DATA | `cargo add petekio` | `pip install petekio` | `0.3.14` |
 | **petekStatic** | GEOMODEL | `cargo add petekstatic` | `pip install petekstatic` | `0.1.12` |
 | **petekSim** | SIMULATION | `cargo add peteksim` | `pip install peteksim` | `0.1.12` |
 

@@ -5,6 +5,19 @@ Python meta-package and documentation/release coordinator for the petek family.
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-07-14
+
+### Changed
+- Advanced the umbrella floors to `petektools>=0.2.14` and
+  `petekio>=0.3.14`. This release adds a stable lazy multi-view project app,
+  compact progressive Map/3-D surface transport, exact surface-clipped wells,
+  practical correlation layouts, persistent project templates/horizons, and
+  canonical EarthVision surface routing.
+- Refreshed the unified visualization and library guides with the new
+  `project.view()` / `petektools.view(...)` workflow, well/surface intersection
+  persistence, correlation templates, geometry-only inference shells, and
+  compact affine surface behavior.
+
 ## [0.1.13] - 2026-07-13
 
 ### Changed

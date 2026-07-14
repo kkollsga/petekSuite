@@ -5,8 +5,8 @@ it. The Rust API reference is published on **docs.rs** at each pinned version.
 
 | Crate | Layer | docs.rs |
 |---|---|---|
-| `petektools` | TOOLKIT | [docs.rs/petektools/0.2.13](https://docs.rs/petektools/0.2.13) |
-| `petekio` | DATA | [docs.rs/petekio/0.3.13](https://docs.rs/petekio/0.3.13) |
+| `petektools` | TOOLKIT | [docs.rs/petektools/0.2.14](https://docs.rs/petektools/0.2.14) |
+| `petekio` | DATA | [docs.rs/petekio/0.3.14](https://docs.rs/petekio/0.3.14) |
 | `petekstatic` | GEOMODEL | [docs.rs/petekstatic/0.1.12](https://docs.rs/petekstatic/0.1.12) |
 | `peteksim` | SIMULATION | [docs.rs/peteksim/0.1.12](https://docs.rs/peteksim/0.1.12) |
 
